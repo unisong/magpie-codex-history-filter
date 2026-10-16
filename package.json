@@ -1,6 +1,6 @@
 {
   "name": "magpie-middleware-codex-history",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "description": "Unified Magpie Codex workbench: history compatibility, optional model checks and protection",
   "type": "module",
   "license": "MIT",

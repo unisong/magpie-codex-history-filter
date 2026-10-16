@@ -25,7 +25,7 @@ export function createHistoryOptions({magpieDirectory = path.join(os.homedir(), 
     if (!Array.isArray(config.plugins)) throw fail('Magpie 插件列表格式异常，未修改配置。', 503);
     const own = config.plugins.filter(entry => typeof entry.spec === 'string' && (
       normalize(entry.spec) === normalize(packageRoot)
-      || /^(?:magpie-model-workbench|magpie-middleware-codex-history)(?:@[^/]+)?$/.test(entry.spec)
+      || /^(?:magpie-model-workbench|magpie-middleware-codex-history|@magpie-community\/middleware-codex-history)(?:@[^/]+)?$/.test(entry.spec)
       || /^github:unisong\/(?:magpie-model-workbench|magpie-codex-history-filter)(?:#.*)?$/.test(entry.spec)));
     if (own.length !== 1) throw fail('无法唯一确定本工作台的安装项，未修改配置。请在 Magpie 原生过滤设置页操作。', 409);
     settings.validate(own[0].options || {});

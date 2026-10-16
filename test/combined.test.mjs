@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {onRequest as original} from '../history/codex-history.middleware.js';
@@ -8,7 +9,14 @@ import {combineMiddleware} from '../server/middleware.mjs';
 import {gateCode} from '../server/engine.mjs';
 import {createHistoryOptions} from '../server/history-options.mjs';
 
-const load = code => import('data:text/javascript,' + encodeURIComponent(code));
+async function load(code) {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'workbench-module-'));
+  const file = path.join(directory, 'middleware.mjs');
+  try {
+    fs.writeFileSync(file, code);
+    return await import(pathToFileURL(file).href);
+  } finally { fs.rmSync(directory, {recursive: true}); }
+}
 const options = {providers: {'magpie:demo': {historyFilter: true, preserveEncryptedInclude: true}}, aliases: {old: 'demo'}};
 const body = {model: 'demo/gpt-6-astra', include: ['reasoning.encrypted_content'], input: [
   {type: 'reasoning', encrypted_content: 'OLD'},
@@ -77,18 +85,19 @@ test('console edits only its filter switches, preserves other plugins/private op
   fs.rmSync(root, {recursive: true});
 });
 
-test('published GitHub installation is recognized while multiple workbench copies are rejected', () => {
+test('published GitHub and community installations are recognized while duplicate copies are rejected', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'workbench-published-'));
   try {
     const file = path.join(root, 'plugins.json');
-    for (const spec of ['github:unisong/magpie-codex-history-filter#v0.3.0', 'magpie-middleware-codex-history@0.3.0']) {
+    for (const spec of ['github:unisong/magpie-codex-history-filter#v0.2.0', 'magpie-middleware-codex-history@0.2.0',
+      '@magpie-community/middleware-codex-history', '@magpie-community/middleware-codex-history@0.2.0']) {
       fs.writeFileSync(file, JSON.stringify({plugins: [{spec, options}]}));
       const store = createHistoryOptions({magpieDirectory: root, packageRoot: path.join(root, 'cache')});
       const before = store.get();
       const draft = structuredClone(before.options); draft.providers['magpie:demo'].historyFilter = false;
       store.save({base: before.options, draft});
       assert.equal(JSON.parse(fs.readFileSync(file)).plugins[0].options.providers['magpie:demo'].historyFilter, false);
-      fs.writeFileSync(file, JSON.stringify({plugins: [{spec, options}, {spec: 'github:unisong/magpie-codex-history-filter#v0.3.0', options}]}));
+      fs.writeFileSync(file, JSON.stringify({plugins: [{spec, options}, {spec: 'github:unisong/magpie-codex-history-filter#v0.2.0', options}]}));
       assert.throws(() => store.get(), /唯一确定/);
     }
   } finally { fs.rmSync(root, {recursive: true}); }

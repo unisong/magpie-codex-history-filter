@@ -1,6 +1,6 @@
 # Magpie Codex 工作台
 
-**一个插件管理历史过滤、可选模型指纹检测和暂停保护。** 当前版本 **v0.3.0**，通过本仓库 GitHub Release 分发。Magpie 社区市场包仍为独立的历史过滤版，GitHub 发版不代表市场已同步更新。
+**一个插件管理历史过滤、可选模型指纹检测和暂停保护。** 当前版本 **v0.2.0**，通过本仓库 GitHub Release 分发。合并版正在同步提交至 Magpie 社区市场；在审核合并并完成分发前，市场版仍为 v0.1.0 纯历史过滤版。
 
 [下载与更新](https://github.com/unisong/magpie-codex-history-filter/releases/latest) · [反馈问题](https://github.com/unisong/magpie-codex-history-filter/issues) · [维护说明](MAINTAINING.md)
 
@@ -13,10 +13,10 @@
 需要支持 server 插件、gateway middleware 和原生插件页面的 Magpie，已在 **0.1.1265** 验证。可通过 GitHub 标签安装：
 
 ```sh
-magpie plugin add github:unisong/magpie-codex-history-filter#v0.3.0
+magpie plugin add github:unisong/magpie-codex-history-filter#v0.2.0
 ```
 
-也可以从 [Release](https://github.com/unisong/magpie-codex-history-filter/releases/tag/v0.3.0) 下载 ZIP，解压后运行 `magpie plugin add /path/to/magpie-codex-workbench-v0.3.0` 将目录作为本地插件添加。无需另外安装 Node.js；完整工作台使用 Magpie 自带的 Bun 后台。Windows 提供 `Open.bat`，其他系统可用 Magpie 的工作台入口。
+也可以从 [Release](https://github.com/unisong/magpie-codex-history-filter/releases/tag/v0.2.0) 下载 ZIP，解压后运行 `magpie plugin add /path/to/magpie-codex-workbench-v0.2.0` 将目录作为本地插件添加。无需另外安装 Node.js；完整工作台使用 Magpie 自带的 Bun 后台。Windows 提供 `Open.bat`，其他系统可用 Magpie 的工作台入口。
 
 安装后，**仅使用历史过滤的用户可直接在 Magpie 内完成设置，无需执行下面的工作台打开步骤**。
 
@@ -26,7 +26,7 @@ Magpie 侧边栏 **Codex Workbench · 历史过滤** 是原生过滤设置页。
 
 ### 从两个插件迁移
 
-本仓库 v0.1.0 是纯历史过滤版；v0.3.0 是合并工作台，沿用原包名和供应商规则。只想保留纯过滤版的用户可以继续使用 v0.1.0 或社区市场版本。
+本仓库 v0.1.0 是纯历史过滤版；v0.2.0 是合并工作台，沿用原包名和供应商规则。只想保留纯过滤版的用户可以继续使用 v0.1.0 或社区市场版本。
 
 先备份 Magpie `plugins.json` 和 `~/.config/magpie-model-workbench/`，不要公开。固定在旧 GitHub 标签的安装项需要改为新标签；建议先复制自己的 Options，再停用旧安装项，将 `providers`、`aliases` 原样复制到合并版 Options，同时保留旧检测插件的其他 Options。旧本地检测目标与记录继续使用原数据目录。最终只启用合并版，避免与旧历史版、市场版或本地版重复过滤。不要修改 Codex 接入地址。
 
@@ -34,7 +34,7 @@ Magpie 侧边栏 **Codex Workbench · 历史过滤** 是原生过滤设置页。
 
 ## 界面预览
 
-以下均为 v0.3.0 当前界面，使用虚构供应商与演示记录，不含真实配置或检测结论。截图中开启的过滤规则是演示设置，新安装默认全部关闭。
+以下均为 v0.2.0 当前界面，使用虚构供应商与演示记录，不含真实配置或检测结论。截图中开启的过滤规则是演示设置，新安装默认全部关闭。
 
 **只用过滤：在 Magpie 内设置，无需打开独立工作台。**
 

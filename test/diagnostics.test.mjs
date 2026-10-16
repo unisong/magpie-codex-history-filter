@@ -64,7 +64,7 @@ test('CLI refuses overwriting an existing output file, including the Codex confi
   assert.equal(result.status, 1); assert.deepEqual(fs.readFileSync(f.config), before);
   assert.doesNotMatch(result.stdout + result.stderr, /PRIVATE_KEY|private-id|fixture\.toml/);
 });
-test('Windows one-click exporter preserves UTF-8 JSON through PowerShell 5.1', {skip: process.platform !== 'win32'}, t => {
+test('Windows one-click exporter preserves UTF-8 JSON through PowerShell 5.1', {skip: process.platform !== 'win32', timeout: 20000}, t => {
   const f = fixture(t), app = path.join(f.directory, 'app'), tools = path.join(app, 'tools'); fs.mkdirSync(tools, {recursive: true});
   for (const name of ['diagnose.ps1', 'diagnose.mjs']) fs.copyFileSync(new URL('../tools/' + name, import.meta.url), path.join(tools, name));
   const result = spawnSync(path.join(process.env.SystemRoot, 'System32/WindowsPowerShell/v1.0/powershell.exe'),

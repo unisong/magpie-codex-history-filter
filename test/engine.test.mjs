@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import {pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {createRequire} from 'node:module';
@@ -66,7 +67,9 @@ test('gate pauses one complete model; signed probes bypass it without changing b
   const f = fixture(), e = createEngine({...f, gateway: () => ({url: 'http://127.0.0.1:1'})});
   const t = e.update({...input, mode: 'protect'}); e.action(t.id, 'pause');
   const code = fs.readFileSync(f.gateFile, 'utf8');
-  const mod = await import('data:text/javascript,' + encodeURIComponent(code));
+  const moduleFile = path.join(f.directory, 'test-gate.mjs');
+  fs.writeFileSync(moduleFile, code);
+  const mod = await import(pathToFileURL(moduleFile).href);
   const history = [{type: 'reasoning', encrypted_content: 'keep-original'}];
   let rejected;
   mod.onRequest({model: input.model, input: history}, {reject: (...args) => { rejected = args; }});

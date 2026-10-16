@@ -1,6 +1,8 @@
-# v0.3.0 · Magpie Codex 合并工作台
+# v0.2.0 · Magpie Codex 合并工作台
 
-将历史过滤、可选模型指纹检测和模型暂停保护合并为一个 Magpie 插件，沿用本仓库原包名。v0.1.0 标签继续保留。此 Release 通过 GitHub 分发，**不表示 Magpie 社区市场纯过滤包已更新**。
+将历史过滤、可选模型指纹检测和模型暂停保护合并为一个 Magpie 插件，沿用本仓库原包名，正式发布记录为 **v0.1.0 → v0.2.0**，支持 GitHub 和社区包名安装。
+
+合并版正在同步提交至 Magpie 社区市场。审核合并并完成分发前，**GitHub 发版不代表市场已更新**。
 
 - 原生「Codex Workbench · 历史过滤」页面直接按供应商设置开关；只用过滤无需登录或打开独立工作台。未配置供应商默认直通，原历史算法不变。
 - 可选本机工作台提供 ModelTrace 指纹、手动检测、定期观测、异常暂停、分页记录及诊断。没有监测目标时不取样，检测故障不阻断历史过滤。
@@ -10,7 +12,7 @@
 ## 安装与迁移
 
 ```sh
-magpie plugin add github:unisong/magpie-codex-history-filter#v0.3.0
+magpie plugin add github:unisong/magpie-codex-history-filter#v0.2.0
 ```
 
 也可下载 ZIP 解压并添加本地目录。已在 Magpie 0.1.1265 验证，工作台使用宿主自带 Bun。Windows 打开控制台可双击包内 `Open.bat`，也可从 Magpie 的本机控制台入口打开，无需账号登录。

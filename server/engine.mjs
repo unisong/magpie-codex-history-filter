@@ -89,7 +89,7 @@ export function createEngine({directory, gateFile, gateway, routeVersion = () =>
   const target = id => state.targets.find(t => t.id === id);
   const healthy = () => { if (closed || health) throw fail(health || '后台已关闭。', 503); };
   function snapshot() {
-    return {version: '0.3.0', health, revision: state.revision, bankVersion: manifest.commit,
+    return {version: '0.2.0', health, revision: state.revision, bankVersion: manifest.commit,
       candidates: models, daily: {used: used(), limit: state.dailyLimit, day: day()},
       targets: state.targets.map(t => ({...t, running: jobs.has(t.id),
         stale: !t.lastChecked || now() - t.lastChecked > t.intervalMinutes * 60000,
@@ -150,7 +150,7 @@ export function createEngine({directory, gateFile, gateway, routeVersion = () =>
         const response = await probe({signal: job.controller.signal, prompt: challenge.prompt,
           context: {model: t.model.slice(slash + 1), requestModel: 'workbench-probe/' + secret + '/' + t.model,
             gatewayProvider: t.model.slice(0, slash), effort: t.effort,
-            transport: {upstream: gw.url, path: '/v1/responses', headers: {'user-agent': 'magpie-workbench-probe/0.3',
+            transport: {upstream: gw.url, path: '/v1/responses', headers: {'user-agent': 'magpie-workbench-probe/0.2',
               ...(gw.key ? {authorization: 'Bearer ' + gw.key} : {})}}}});
         if (job.controller.signal.aborted) throw fail('检测已取消。');
         s.text = String(response.text || '').slice(0, 65536); s.usage = response.usage || null; s.reportedModel = response.model;

@@ -21,8 +21,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--binary', required=True)
 parser.add_argument('--bun', help='Reuse an existing Magpie Bun, avoiding a download in the disposable profile')
 parser.add_argument('--screenshot-dir')
+parser.add_argument('--package-dir', help='Test an unpacked public archive instead of the source checkout')
 args = parser.parse_args()
-root = Path(__file__).resolve().parent.parent
+root = Path(args.package_dir).resolve() if args.package_dir else Path(__file__).resolve().parent.parent
 scratch = Path(tempfile.mkdtemp(prefix='magpie-workbench-smoke-')).resolve()
 app = scratch / 'app'
 app.mkdir()
@@ -140,6 +141,21 @@ def business(pid='demo'):
         response = e
     with response:
         return response.status, response.read().decode()
+
+
+def expect_reloaded_filter(items):
+    # The Bun console can be ready before the gateway publishes its new hook.
+    # Poll only mock business requests; a permanently stale hook still fails.
+    last = None
+    for _ in range(40):
+        before = len(seen)
+        status, response = business()
+        count = len(seen[-1]['input']) if len(seen) > before else None
+        if status == 200 and count == items:
+            return
+        last = (status, count, response)
+        time.sleep(.2)
+    raise AssertionError(('reloaded filter did not apply', items, last))
 
 
 try:
@@ -272,7 +288,7 @@ try:
         assert current_runtime['origin'] == original_runtime['origin'], 'console address changed on options reload'
         page.locator('#filterRefresh').click()
         expect(demo_filter).not_to_be_checked()
-        assert business()[0] == 200 and len(seen[-1]['input']) == 2
+        expect_reloaded_filter(2)
         # Restore filtering through the native Magpie page, then read it back
         # from the existing console session without another sign-in.
         native = browser.new_page(viewport={'width':1200, 'height':900}, locale='zh-CN')
@@ -283,8 +299,7 @@ try:
         frame.locator('input[data-id=demo][data-field=historyFilter]').check()
         frame.locator('#save').click()
         expect(frame.locator('#notice')).to_have_attribute('data-kind', 'success')
-        time.sleep(1.2)
-        assert business()[0] == 200 and len(seen[-1]['input']) == 1
+        expect_reloaded_filter(1)
         page.locator('#filterRefresh').click()
         expect(demo_filter).to_be_checked()
         assert probe_index == 6, 'filter settings generated unexpected paid probes'
