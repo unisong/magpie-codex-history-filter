@@ -1,6 +1,6 @@
 # Magpie Codex 工作台
 
-**一个插件管理历史过滤、可选模型指纹检测和暂停保护。** 当前版本 **v0.2.0**，通过本仓库 GitHub Release 分发。合并版正在同步提交至 Magpie 社区市场；在审核合并并完成分发前，市场版仍为 v0.1.0 纯历史过滤版。
+**一个插件管理历史过滤、可选模型指纹检测和暂停保护。** 当前版本 **v0.2.0**，通过本仓库 GitHub Release 分发。合并版已通过 [社区市场更新 PR #168](https://github.com/magpie-community/plugins/pull/168) 的自动检查，等待维护者审核合并；在合并并完成分发前，市场版仍为 v0.1.0 纯历史过滤版。
 
 [下载与更新](https://github.com/unisong/magpie-codex-history-filter/releases/latest) · [反馈问题](https://github.com/unisong/magpie-codex-history-filter/issues) · [维护说明](MAINTAINING.md)
 

@@ -1,6 +1,6 @@
 # 维护与发布
 
-本仓库从 v0.2.0 起发布合并工作台，保留原包名 `magpie-middleware-codex-history` 和 v0.1.0 标签。合并版已准备同步至 Magpie 社区市场；**推送本仓库或创建 GitHub Release 不会自动更新市场，需待社区审核合并与分发**。
+本仓库从 v0.2.0 起发布合并工作台，保留原包名 `magpie-middleware-codex-history` 和 v0.1.0 标签。合并版已提交 [社区 PR #168](https://github.com/magpie-community/plugins/pull/168)；**推送本仓库或创建 GitHub Release 不会自动更新市场，需待社区审核合并与分发**。
 
 | 分发入口 | 仓库 / 包名 | 谁能发布 |
 | --- | --- | --- |
