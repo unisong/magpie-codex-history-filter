@@ -16,7 +16,7 @@ magpie plugin add github:unisong/magpie-codex-history-filter#v0.1.0
 
 也可下载 [Release](https://github.com/unisong/magpie-codex-history-filter/releases) 中的插件包，解压后通过本地目录添加。无需启动 Codex Filter Manager。需要支持 gateway middleware 的 Magpie；原始插件已在 0.1.1265 验证，其他版本需核对插件加载状态。
 
-社区市场收录通过 `magpie-community/plugins` 审核；GitHub 发布不等于已上架市场。审核合并后可在 **Plugins → Discover → Gateway middleware** 搜索 **Codex History Filter**。社区包名为 `@magpie-community/middleware-codex-history`，无需同时安装两份。
+已提交[社区市场收录申请 #152](https://github.com/magpie-community/plugins/pull/152)，等待维护者审核；GitHub 发布不等于已上架市场。审核合并后可在 **Plugins → Discover → Gateway middleware** 搜索 **Codex History Filter**。社区包名为 `@magpie-community/middleware-codex-history`，无需同时安装两份。
 
 ## 设置
 
