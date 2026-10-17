@@ -1,59 +1,34 @@
-# 维护与发布
+# 社区版维护与同步
 
-本仓库从 v0.2.0 起发布合并工作台，保留原包名 `magpie-middleware-codex-history` 和 v0.1.0 标签。合并版已提交 [社区 PR #168](https://github.com/magpie-community/plugins/pull/168)；**推送本仓库或创建 GitHub Release 不会自动更新市场，需待社区审核合并与分发**。
+本仓库的 `main` 和最新正式 Release 对齐 Magpie 社区的纯历史过滤插件，当前为 **v0.1.1**。社区来源是 [packages/codex-history](https://github.com/magpie-community/plugins/tree/main/packages/codex-history)，本次修复已在 [PR #204](https://github.com/magpie-community/plugins/pull/204) 合并。
 
-| 分发入口 | 仓库 / 包名 | 谁能发布 |
-| --- | --- | --- |
-| GitHub 合并工作台与 Release | `unisong/magpie-codex-history-filter`，包名 `magpie-middleware-codex-history` | 本仓库维护者 |
-| Magpie 社区市场（合并版待审核） | `magpie-community/plugins/packages/codex-history`，包名 `@magpie-community/middleware-codex-history` | 维护者提交 PR，社区审核合并后自动分发 |
+## 哪些内容需要一致
 
-## 目录与本地验证
+- 版本号、`package.json`、请求入口、过滤规则和默认值、源码适配器、回归用例、测试、README、许可及来源记录保持一致。
+- GitHub Release 的 `.tgz` 使用社区 `dist` 的原始安装包，按索引中的 SHA-512 校验；ZIP 只把该包解压成便于添加的本地目录。
+- 本仓库可以增加维护说明和离线 CI。它们不进入插件安装包，不增加 UI、后台、模型检测或自动保护。
+- 社区包名保持 `@magpie-community/middleware-codex-history`。本仓库不自行发布社区 npm 作用域。
 
-| 目录 / 文件 | 职责 |
-| --- | --- |
-| `plugin/` | Magpie server 插件入口 |
-| `server/` | 本机后台、取样、评分、记录与暂停规则 |
-| `web/` | 独立工作台界面 |
-| `history/` | 保持校验值的历史过滤基准、搜索历史文字转换扩展与当前原生设置页 |
-| `test/`、`tools/` | 离线测试、构建、诊断、截图与打包 |
-| `vendor/`、`docs/` | 第三方组件与许可、使用说明与截图 |
-| `workbench.middleware.js` | 宿主需要的合并请求入口，由构建生成 |
-| `codex-history.middleware.js`、`PROVENANCE.json` | 保留的原历史入口与来源校验，作为兼容和回归基准 |
-| `page/`、`cases.json` | 原历史版的页面资源与回归用例；当前宿主页面由 `history/page/` 提供 |
-
-根目录保留宿主入口与原算法校验基准，避免搬动或改写它们导致兼容入口和来源校验失效。当前合并入口另外编入 `history/portable-web-search.mjs`：启用过滤时，把依赖旧推理的原生搜索调用转为普通文字记录；原始钩子及其基准用例保持原样，新行为在 `test/web-search-history.test.mjs` 单独验证。
+## 本地验证
 
 ```sh
-npm run build
-npm test
-python test/web-check.py
-python test/magpie-smoke.py --binary /path/to/magpie.exe --bun /path/to/magpie-bun.exe
+node --test test/cases.test.mjs web-search.test.mjs
+npm pack --ignore-scripts --dry-run
 ```
 
-浏览器验证需要 Python Playwright 和 Chromium，也可用 `CHROME_PATH` 指定浏览器。宿主测试使用临时便携配置和模拟上游，验证单插件安装、偏离暂停、其他模型放行、原生页共享规则、宿主重载与后台故障隔离，不调用真实供应商。
+在社区仓库还需运行 `bun test packages/codex-history`。测试只使用虚构请求，不调用真实供应商。安装包仅包含 `package.json`、`codex-history.middleware.js`、`README.md`、`LICENSE` 和 `PROVENANCE.json`。
 
-## 每次更新
+## 后续更新
 
-1. 在本仓库修复问题，更新 `package.json`、`server/engine.mjs` 与 `server/http.mjs` 的版本字段、界面版本文字与对应测试。编写 Release 说明；纯诊断工具不能进入请求关键路径，也不能新增隐私日志。
-2. 运行 `npm run build`、`npm test`、`python test/web-check.py`。宿主改动需运行 `python test/magpie-smoke.py --binary /path/to/magpie.exe --bun /path/to/magpie-bun.exe`，使用临时便携宿主和模拟上游。不要在安装中的插件目录测试，不用真实供应商凭据。
-3. 用 `python tools/screenshots.py` 更新演示截图。暂存公共文件后运行 `npm run release:check` 和 `python tools/package-release.py`，检查包内没有个人路径、凭据、检测数据或运行中的生成门禁。推送并等 CI 通过后发布 ZIP、TGZ 与校验值；发布过的标签和附件不可覆盖。README 安装命令需同步更新。
-4. 社区市场单独维护：从最新社区 `main` 创建新分支，更新 `packages/codex-history/`，不要复用已合并的旧 PR。同步合并工作台时保留社区包名、发布入口及测试要求，明确新增后台、文件读写和可选检测的边界；不能仅复制 package.json。打包必须重新生成无私密门禁的入口，并用真实宿主和模拟上游验证社区包名安装。
-5. 保留社区包名、`repository.directory`、标准 Bun 测试入口，更新其版本、`files` 和 README。同步原生页面时保留 `permissions: ["providers:list"]`；如功能分类有变化，再修改 registry 和总 README。
-6. 提交 PR，附问题、改动、测试结果及对配置/隐私的影响。审核合并后，检查 `publish` 的 **test** 与 **dist** 步骤、dist 索引的版本与完整性值。不能只看 workflow 总体红绿：无关 npm 包的发布失败不一定阻断本插件 dist 分发。
-7. 用隔离目录验证新版本可从市场包名安装，再告知用户升级。市场正式可用以前，不要把 GitHub 发版等同于市场上架。
+1. 为社区纯过滤插件提交小范围修复，更新版本、测试和必要说明。
+2. 合并后从社区源码同步本仓库；核对 `dist/index.json` 的实际版本和完整性值。GitHub 发版不等于社区市场已更新。
+3. 对照社区安装包检查五个文件及版本，运行离线验证，再发布同版本 GitHub Release。更新功能边界时同步迁移说明。
+4. 是否增加小型原生过滤设置页，后续根据用户反馈决定；目前通过 Magpie 的 Options 配置。
 
-社区补丁若先于本仓库合入，应将相同修复同步回本仓库，避免两份源码分叉。当前过滤逻辑源自 Codex Filter Manager，修改共用算法时也应评估同步至该项目的 `magpie-plugin/history-filter.mjs` 和本地插件。
+## 历史工作台与迁移
 
-## 用户怎样更新
+v0.2.0 和 v0.2.1 是此前的合并工作台版本，已撤回社区提案，不属于社区纯过滤插件的版本序列。旧标签及附件保留作为历史记录；发布页明确标记为历史工作台，不作为社区版最新版。
 
-- **市场安装**：通过 Magpie 插件页更新，或 `magpie plugin update`（该命令会更新全部插件）。不同 Magpie 版本的后台更新和缓存策略可能不同，核对 Installed 中的实际版本。
-- **固定 GitHub 标签安装**：仍固定在该标签；用新标签地址更新或重新安装，旧标签不会自动跳到新标签。迁移前备份本插件的 Options，不要公开整个 plugins.json。
-- **本地目录安装**：替换本地源码不会自动从市场下载新版本。按 README 迁移，停用旧副本后安装市场版，不要同时开启两份。
+模型工作台仅作本地维护。公共 `main` 的同步不更新本机已安装插件、不改写 Magpie Options、Codex `base_url` 或检测数据。原固定本地工作台目录仍可使用；不要在启用它的同时，再启用另一份历史过滤插件。
 
-## npm 和权限
-
-`@magpie-community/*` 属于社区组织。不要自行向其作用域发布或索要其 npm 凭据。当前社区 dist 分发支持尚未首次发布到 npm 的新包；未来是否首次 npm 发布由社区维护者处理。贡献者只需有自己 fork 的推送权限和提交 PR 的 GitHub 登录。
-
-## v0.2.0 分发边界
-
-合并版使用 Magpie 自带 Bun，无需另装 Node.js。原生页只管理历史过滤；完整工作台在本机浏览器打开。安装默认不启用过滤、监测或保护。历史算法保持根目录原始钩子与 `history/` 相同 SHA-256，模型库保留来源与 MIT 许可。不要从安装中的插件拷贝 `workbench.middleware.js` 回源码；后台可能已在该文件写入私密探针凭据和暂停规则，发版必须由 `npm run build` 重新生成公共入口。
+用户若决定从合并工作台迁移到纯过滤版，先私下备份需要的 Options 与工作台数据，在 Magpie 中停用旧插件，再安装社区版并复制所需过滤规则。纯过滤版只使用 `providers` 和 `aliases`，没有模型检测与暂停保护，也不提供工作台入口。

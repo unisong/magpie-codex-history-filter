@@ -1,86 +1,89 @@
-# Magpie Codex 工作台
+# @magpie-community/middleware-codex-history
 
-**一个 Magpie 插件，管理 Codex 历史过滤、可选模型指纹检测与异常暂停。** 按供应商保存过滤规则，不修改 Codex 的 `base_url`、模型或会话文件。
+**Magpie 原生历史过滤插件 / Native history compatibility middleware**
 
-当前 GitHub 版本 **v0.2.1**。[下载与更新](https://github.com/unisong/magpie-codex-history-filter/releases/latest) · [反馈问题](https://github.com/unisong/magpie-codex-history-filter/issues) · [更新说明](docs/RELEASE-v0.2.1.md)
+缓解 Codex 切换供应商、账号或上游资源后，旧会话出现密文验证失败、部分历史 item ID 不属于当前资源的问题。只处理发出的 Responses 请求，不修改原会话文件或 Codex `base_url`。
 
-社区合并版 [PR #168](https://github.com/magpie-community/plugins/pull/168) 尚待审核，市场版仍为 v0.1.0 纯过滤版；GitHub 发版不等于市场已更新。
+**插件只提供历史过滤，不包含 ModelTrace、降智检测或模型保护。** 无独立后台服务、管理端口、运行时依赖或额外模型请求。规则默认全部关闭，在 Magpie 自带的插件 Options 中按供应商设置。
 
-## 安装与使用
+## 安装
 
-需要支持 server 插件、gateway middleware 和原生插件页面的 Magpie，已在 **0.1.1265** 验证。工作台使用 Magpie 自带 Bun，无需另装 Node.js。
+在 Magpie 的 **Plugins → Discover → Gateway middleware** 中安装 **Codex History Filter**，或使用命令行：
 
 ```sh
-magpie plugin add github:unisong/magpie-codex-history-filter#v0.2.1
+magpie plugin add @magpie-community/middleware-codex-history
 ```
 
-也可下载 [Release ZIP](https://github.com/unisong/magpie-codex-history-filter/releases/tag/v0.2.1)，完整解压后通过 `magpie plugin add /path/to/magpie-codex-workbench-v0.2.1` 添加本地目录。
+社区版本只发布历史过滤中间件；模型工作台单独本地维护，不包含在本包中。无需启动 Codex Filter Manager，不要同时启用两份过滤插件。需要支持 gateway middleware 的 Magpie；本包已在 0.1.1265 的隔离实例中验证，其他版本需核对插件加载状态。
 
-1. 在 Magpie 侧边栏打开 **Codex Workbench · 历史过滤**，选择供应商，开启需要的规则并保存。
-2. **只用历史过滤，到这里即可。无需打开独立工作台，也无需登录。** 启用状态、调用数和错误在 Magpie 扩展／插件页面查看。
-3. 需要模型检测时，Windows 双击 **`Open.bat`** 或桌面「Magpie 模型工作台」；也可从 **Codex Workbench · 本机控制台** 打开。宿主可能把入口放在登录方法选择器中，但这里只打开本机页面，不需要账号。
+## 设置
 
-**新安装的过滤、监测和保护均默认关闭。** 不要与旧版、独立过滤服务或其他本地副本重复启用。升级前备份自己的 Options 与检测数据；具体迁移见 [使用说明](docs/USAGE.md#更新与迁移)。
+打开 **Plugins → Installed → 本插件 → Options**，保存以下示例，替换 `demo` 和 `backup` 为你实际使用的 Magpie 供应商 ID：
 
-## 历史过滤
+```json
+{
+  "providers": {
+    "magpie:demo": {
+      "historyFilter": true,
+      "preserveEncryptedInclude": true
+    },
+    "magpie:backup": {
+      "historyFilter": false,
+      "preserveEncryptedInclude": true
+    }
+  },
+  "aliases": {}
+}
+```
 
-| 开关 | 作用与建议 |
-| --- | --- |
-| 历史过滤 | 清理旧 reasoning、明确密文块及可移植历史的服务器 ID；只为出现兼容错误的供应商开启 |
-| 保留新响应密文 | 保留客户端对新响应密文的请求，旧历史密文仍会清理；通常保持勾选 |
+- 请求模型为 `demo/gpt-6-astra` 时，使用 `magpie:demo` 的规则；ID 是模型前缀，不是供应商显示名称。
+- `historyFilter: true` 开启过滤；`false`、删除该规则或空配置均为直通。不同会话按各自请求独立处理，可同时过滤多个供应商。
+- `preserveEncryptedInclude: true` 保留客户端对**新响应**中 `reasoning.encrypted_content` 的请求，推荐开启。它不会保留**旧历史**中的密文。省略或设置为 `false` 会移除这一 include 值，不影响其他 include 项。
+- 供应商改名后，旧会话可能仍发送旧前缀；可设置 `"aliases": {"old-demo": "demo"}`。别名只用于选择过滤规则，不改写请求模型，也不替代 Magpie 自己的路由别名。
+- 无 `供应商/模型` 前缀或非 Responses 协议的请求保持原样。未配置的供应商不会被自动过滤。
 
-保留正文、工具参数与结果及 `call_id` 配对。不同会话按各自请求的 `供应商/模型` 前缀独立处理；不可迁移的服务器引用或加密压缩历史会明确拒绝。
+保存 Options 后，Magpie 在后续请求加载规则。无需另开网页或重启 Codex；是否成功加载以 Magpie 插件页的错误与调用统计为准。
 
-v0.2.1 修复旧 `web_search_call` 缺少关联 `reasoning` 的错误：开启历史过滤后，将历史搜索调用转换为文字记录，保留已记录的查询与后续结论，避免重放依赖原资源的搜索条目。普通对话与完整明文历史的压缩总结均适用；不解密加密压缩块。[处理原理与边界](docs/USAGE.md#历史过滤)
+## 原理与边界
 
-原生设置页与独立工作台编辑同一份规则。过滤不依赖浏览器页面或检测后台，保存规则后由 Magpie 重载，无需重启 Codex。[过滤原理与路由边界](docs/USAGE.md#历史过滤)
+开启后，插件移除旧 reasoning 条目、明确标记的加密内容，以及可独立携带内容的消息和工具条目中的可选服务器 ID；设置 `store: false`。保留正文、工具参数、结果、`call_id` 配对、文件引用及普通业务 ID，不改变请求模型或推理强度。
 
-![Magpie 原生历史过滤页面](docs/images/native-filter.png)
+**v0.1.1：历史搜索兼容修复。** 原生 `web_search_call` 可能依赖已删除的 reasoning，导致上游提示 `was provided without its required reasoning item`。开启过滤后，历史搜索条目转为带标记的助手文字，保留已记录的动作、查询、状态和来源数据，去除服务器条目 ID 与内部回合元数据；后续结论、引用及普通工具调用配对保持原样。不重新搜索、不补造未记录的结果。该处理适用于携带明文历史的普通对话和文字总结，不解密压缩历史。
 
-## 可选模型监测
+`previous_response_id`、`conversation`、`item_reference`、加密压缩历史和 `/responses/compact` 无法安全跨资源迁移时，会明确拒绝，提示整理文字摘要后新建会话，不会静默丢弃这些上下文。
 
-页面优先展示最近实际 Codex 路由，其次采用检测记录；无记录才在本页手动选择。「调整监测」直接在当前页展开，保存与刷新不会调用模型。
+- 不能解密旧密文、迁移所有服务器资源引用，或保证消除全部 Azure 历史错误。移除内部推理状态也可能影响长任务连续性。
+- Magpie 请求钩子限时 250 毫秒；加载失败、异常或超时可能按 Magpie 的机制放行原请求。插件不是强制安全边界。
+- 只覆盖进入 Magpie agent middleware 的 Responses 请求；Magpie 自身的标题、分类器等内部请求不经过此钩子。WebSocket、Chat Completions、Lite HTTP 标头修改不在本插件范围内。
+- 规则按进入钩子时的模型前缀选择。自动路由组、fallback、其他插件随后改写路由时，不保证规则对应最终上游。
+- 不采集或保存凭据、请求正文，不执行检测、重试或模型调用。上游正常请求仍按上游规则计费。
 
-| 模式 | 行为 | 建议 |
-| --- | --- | --- |
-| 手动检测 | 点击才取样，不自动暂停 | 首次使用推荐 |
-| 定期观测 | 按间隔取样和记录，不自动暂停 | 先观察供应商表现 |
-| 异常暂停 | 首次强偏离暂停该完整模型的后续请求，再独立复测 | 理解误报与暂停边界后使用 |
+## 停用、升级与旧版迁移
 
-检测使用 [ModelTrace](https://github.com/xqy2006/ModelTrace) 的数字挑战与本机评分，通过自己的 Magpie 供应商调用，**会消耗额度**。通常 3 个请求，强偏离时追加复核。默认共享预算 60 次请求 / UTC 日；每 30 分钟全天检测一个目标至少需要 144 次，默认预算不足以覆盖全天。定期检测不会因关闭页面而停止。
+在 Magpie 插件页关闭本插件即可停止全部过滤；删除某条供应商规则只停用该供应商。卸载也在 Magpie 中完成，不需要恢复 `base_url`。通过本地路径安装时，移动或删除目录前先卸载旧插件。
 
-检测错误、样本不足不等于确认降智；已暂停模型需明确解除或限时放行。检测记录每页 10 条，保留最近 100 轮。[取样、费用、判定与暂停规则](docs/USAGE.md#模型指纹检测)
+若此前使用 Codex Filter Manager v1.0.5 自动安装的本地 `magpie-plugin`，先在旧管理页关闭该供应商的自动保护（若有旧设置），停止旧管理服务，再在 Magpie 中停用或卸载旧的本地历史插件，最后安装本插件并复制所需历史规则。原有规则的 `stripResponsesLiteHeader` 会被忽略，可删除。不要同时启用两份历史过滤插件。
 
-<details>
-<summary>查看模型监测、同页设置、记录与深色主题</summary>
+社区版本合并并完成 dist 发布后，可在 Magpie 插件页更新；现有 Options 无需改写，更新前可自行备份。不要上传 Magpie 的 `plugins.json`，它可能包含其他插件的私有设置。本插件不直接读写该文件，规则由宿主通过 Options 传入。
 
-![模型监测工作台](docs/images/monitor-light.png)
-![同页调整监测](docs/images/monitor-settings.png)
-![检测记录](docs/images/history.png)
-![深色模型监测](docs/images/monitor-dark.png)
+## English
 
-</details>
+Opt-in Magpie gateway middleware for Codex Responses history after switching providers or accounts. It strips old reasoning/encrypted items and optional server IDs from portable history, preserving readable content and tool-call pairing. **History filtering only: no model detector, guard, background server, credentials or extra upstream calls.**
 
-## 限制与诊断
+Install from **Plugins → Discover → Gateway middleware**, or run `magpie plugin add @magpie-community/middleware-codex-history`. In the plugin's **Options**, configure `providers["magpie:<provider-id>"]` as shown above. Every provider defaults to passthrough. The request's `provider/model` prefix selects its rule; requests from different sessions remain independent. `aliases` maps an old prefix to a rule ID only. `preserveEncryptedInclude: true` keeps requests for new encrypted response content while still removing historical ciphertext.
 
-- 完整工作台在本机浏览器打开，后台随 Magpie 运行；原生页面负责过滤设置。四个分区和明暗主题操作与 CC Switch 工作台一致。
-- 指纹是有限参考库的统计结果，不证明模型身份或编程能力；路由组仅支持观测，fallback 或其他插件可能改变最终上游。
-- 暂停只阻止后续请求，不能撤回输出或中止已开始的响应。首次未验证、网络错误不会自动阻止请求；宿主加载失败、异常或超时可能放行原请求。
-- 停用整个插件会同时停用过滤和暂停保护。只想停止自动监测时，把目标改为手动或删除目标。
+Unsafe server-only references and encrypted compaction are rejected explicitly. Magpie may fail open on plugin errors/timeouts, and downstream route changes are outside the plugin's control. Disable or remove it in Magpie; it never edits Codex configuration.
 
-### 诊断与问题反馈
+Version 0.1.1 converts historical native `web_search_call` items to labeled assistant text after removing old reasoning. Recorded actions, queries, status and sources remain available; native item IDs and internal turn metadata are removed. Subsequent answers and ordinary tool-call pairs remain intact. No searches are rerun, absent results are not reconstructed, and encrypted compaction is not decrypted. The community package contains only the middleware; the optional model workbench is maintained separately for local use.
 
-在「设置与诊断」导出脱敏摘要；只用过滤时，也可运行 `Diagnose.bat` 做只读配置诊断（此可选 CLI 需要 Node.js 18+ 或 Bun）。实时过滤统计仍以 Magpie 插件页为准。
+## 开发与来源
 
-数据保存在 `~/.config/magpie-model-workbench/`，过滤规则在 Magpie `plugins.json` 的本插件 Options。**不要公开整个数据目录、运行中的生成钩子或原始配置。** 诊断不调用模型，无自动上传；完整证据分享前请自行检查。[数据与诊断详情](docs/USAGE.md#本地数据与诊断)
+```sh
+bun test packages/codex-history
+```
 
-## 文档与开发
+测试只使用本地虚构数据，不调用模型。核心代码来自 [Codex Filter Manager v1.0.5](https://github.com/unisong/codex-filter-manager/tree/v1.0.5)，来源和 SHA-256 记录于 [PROVENANCE.json](PROVENANCE.json)。为匹配社区 middleware 包格式，将共用算法与请求钩子合并为单个无 import 文件。
 
-- [使用与检测说明](docs/USAGE.md)：升级迁移、开关原理、取样预算、评分阈值、暂停与架构限制。
-- [维护与发布](MAINTAINING.md)：目录职责、离线验证、GitHub 发版与社区市场更新。
+接口参考：[Magpie middleware 文档](https://usemagpie.ai/docs/plugins#middleware)。
 
-## 许可与致谢
-
-[MIT](LICENSE)。感谢 [ModelTrace](https://github.com/xqy2006/ModelTrace) 提供评分器、中文挑战与参考库，原许可和固定来源见 [vendor/modeltrace/](vendor/modeltrace/)。历史算法来自 [Codex Filter Manager](https://github.com/unisong/codex-filter-manager)，保留原始文件及 [来源校验](history/PROVENANCE.json)。接入方式参考 [magpie-intelligence-check](https://github.com/mu-zi-lee/magpie-intelligence-check)，未复制其题库、Go 后台或门禁实现。感谢 [Magpie](https://github.com/yetone/magpie) 与上述项目维护者。
-
-友情链接：[LINUX DO](https://linux.do/)
+MIT，保留原项目贡献者署名，见 [LICENSE](LICENSE)。

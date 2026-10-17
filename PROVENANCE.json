@@ -14,8 +14,7 @@
   "changes": [
     "Inlined the shared history algorithm and request hook into one import-free middleware file.",
     "Removed helper exports; only onRequest is exported.",
-    "This provenance describes only the original codex-history.middleware.js, which remains unchanged. It does not describe the combined workbench entry.",
-    "The v0.2.0 workbench composes this original hook with optional model monitoring and protection. See history/PROVENANCE.json and vendor/modeltrace/PROVENANCE.json for the combined distribution sources.",
-    "A native Magpie settings page and an optional read-only diagnostic tool are maintained separately from the unchanged history algorithm."
+    "No model detection, guard, dashboard, proxy service or provider configuration is included.",
+    "Version 0.1.1 adds history/portable-web-search.mjs, inlined into the middleware to convert historical native web_search_call items to labeled text after reasoning is removed. Original source hashes above identify the v1.0.5 baseline, not the modified middleware."
   ]
 }
