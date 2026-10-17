@@ -25,7 +25,7 @@ magpie plugin add github:unisong/magpie-codex-history-filter#v0.1.1
 
 ## 版本与旧工作台
 
-社区纯过滤版的序列是 **v0.1.0 → v0.1.1**。旧 v0.2.0 / v0.2.1 是合并工作台的历史版本，不能按数字大小把它们当作社区版更新。旧标签和附件保留，当前社区版不加载工作台配置，也不提供检测或暂停。
+社区纯过滤版的序列是 **v0.1.0 → v0.1.1**。旧 v0.2.0 / v0.2.1 的合并工作台 Release 已移除，源码收回 [Codex Filter Manager](https://github.com/unisong/codex-filter-manager/tree/main/magpie-workbench) 主仓库；Git 历史仍可查阅。当前社区版不加载工作台配置，也不提供检测或暂停。
 
 本次公开仓库同步不会替换本机已安装的工作台。希望保留本地工作台的用户无需迁移；如改用纯过滤版，先停用旧工作台插件，备份并复制需要的过滤 Options，避免重复过滤。
 

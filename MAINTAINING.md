@@ -27,8 +27,8 @@ npm pack --ignore-scripts --dry-run
 
 ## 历史工作台与迁移
 
-v0.2.0 和 v0.2.1 是此前的合并工作台版本，已撤回社区提案，不属于社区纯过滤插件的版本序列。旧标签及附件保留作为历史记录；发布页明确标记为历史工作台，不作为社区版最新版。
+本仓库只保留社区纯过滤版的 Release：v0.1.0、v0.1.1。此前 v0.2.0 / v0.2.1 的合并工作台 Release 已移除；旧提交与 Git 标签仅作为源码历史，不用于分发或社区更新。以后工作台不在本仓库发版。
 
-模型工作台仅作本地维护。公共 `main` 的同步不更新本机已安装插件、不改写 Magpie Options、Codex `base_url` 或检测数据。原固定本地工作台目录仍可使用；不要在启用它的同时，再启用另一份历史过滤插件。
+完整模型工作台的源码与后续开发统一在 [Codex Filter Manager](https://github.com/unisong/codex-filter-manager/tree/main/magpie-workbench) 维护。公共 `main` 的同步不更新本机已安装插件、不改写 Magpie Options、Codex `base_url` 或检测数据。原固定本地工作台目录仍可使用；不要在启用它的同时，再启用另一份历史过滤插件。
 
 用户若决定从合并工作台迁移到纯过滤版，先私下备份需要的 Options 与工作台数据，在 Magpie 中停用旧插件，再安装社区版并复制所需过滤规则。纯过滤版只使用 `providers` 和 `aliases`，没有模型检测与暂停保护，也不提供工作台入口。
