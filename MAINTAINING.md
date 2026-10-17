@@ -7,6 +7,31 @@
 | GitHub 合并工作台与 Release | `unisong/magpie-codex-history-filter`，包名 `magpie-middleware-codex-history` | 本仓库维护者 |
 | Magpie 社区市场（合并版待审核） | `magpie-community/plugins/packages/codex-history`，包名 `@magpie-community/middleware-codex-history` | 维护者提交 PR，社区审核合并后自动分发 |
 
+## 目录与本地验证
+
+| 目录 / 文件 | 职责 |
+| --- | --- |
+| `plugin/` | Magpie server 插件入口 |
+| `server/` | 本机后台、取样、评分、记录与暂停规则 |
+| `web/` | 独立工作台界面 |
+| `history/` | 保持校验值的历史过滤基准、搜索历史文字转换扩展与当前原生设置页 |
+| `test/`、`tools/` | 离线测试、构建、诊断、截图与打包 |
+| `vendor/`、`docs/` | 第三方组件与许可、使用说明与截图 |
+| `workbench.middleware.js` | 宿主需要的合并请求入口，由构建生成 |
+| `codex-history.middleware.js`、`PROVENANCE.json` | 保留的原历史入口与来源校验，作为兼容和回归基准 |
+| `page/`、`cases.json` | 原历史版的页面资源与回归用例；当前宿主页面由 `history/page/` 提供 |
+
+根目录保留宿主入口与原算法校验基准，避免搬动或改写它们导致兼容入口和来源校验失效。当前合并入口另外编入 `history/portable-web-search.mjs`：启用过滤时，把依赖旧推理的原生搜索调用转为普通文字记录；原始钩子及其基准用例保持原样，新行为在 `test/web-search-history.test.mjs` 单独验证。
+
+```sh
+npm run build
+npm test
+python test/web-check.py
+python test/magpie-smoke.py --binary /path/to/magpie.exe --bun /path/to/magpie-bun.exe
+```
+
+浏览器验证需要 Python Playwright 和 Chromium，也可用 `CHROME_PATH` 指定浏览器。宿主测试使用临时便携配置和模拟上游，验证单插件安装、偏离暂停、其他模型放行、原生页共享规则、宿主重载与后台故障隔离，不调用真实供应商。
+
 ## 每次更新
 
 1. 在本仓库修复问题，更新 `package.json`、`server/engine.mjs` 与 `server/http.mjs` 的版本字段、界面版本文字与对应测试。编写 Release 说明；纯诊断工具不能进入请求关键路径，也不能新增隐私日志。

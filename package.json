@@ -1,11 +1,11 @@
 {
   "name": "magpie-middleware-codex-history",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Unified Magpie Codex workbench: history compatibility, optional model checks and protection",
   "type": "module",
   "license": "MIT",
   "main": "./plugin/index.mjs",
-  "files": ["plugin", "server", "web", "history", "vendor", "workbench.middleware.js", "Open.bat", "tools", "docs/images", "README.md", "MAINTAINING.md", "LICENSE", "PROVENANCE.json", "codex-history.middleware.js", "Diagnose.bat"],
+  "files": ["plugin", "server", "web", "history", "vendor", "workbench.middleware.js", "Open.bat", "tools", "docs/images", "docs/USAGE.md", "docs/RELEASE-v0.2.0.md", "docs/RELEASE-v0.2.1.md", "README.md", "MAINTAINING.md", "LICENSE", "PROVENANCE.json", "codex-history.middleware.js", "Diagnose.bat"],
   "keywords": ["magpie", "magpie-middleware", "codex", "responses", "history"],
   "repository": {"type": "git", "url": "git+https://github.com/unisong/magpie-codex-history-filter.git"},
   "bugs": {"url": "https://github.com/unisong/magpie-codex-history-filter/issues"},

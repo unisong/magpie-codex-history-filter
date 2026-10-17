@@ -36,7 +36,7 @@ for (const file of ['codex-history.middleware.js', 'history/codex-history.middle
 }
 const generated = fs.readFileSync(path.join(root, 'workbench.middleware.js'), 'utf8');
 if (generated !== combineMiddleware()) issues.push('workbench.middleware.js: must rebuild the public entry without private holds');
-for (const required of ['README.md', 'MAINTAINING.md', 'LICENSE', 'plugin/index.mjs', 'server/http.mjs', 'web/index.html', 'history/page/index.html', 'docs/images/native-filter.png', 'docs/images/monitor-light.png', 'docs/images/monitor-dark.png', 'docs/images/monitor-settings.png', 'docs/images/history.png']) {
+for (const required of ['README.md', 'MAINTAINING.md', 'LICENSE', 'plugin/index.mjs', 'server/http.mjs', 'web/index.html', 'history/portable-web-search.mjs', 'history/page/index.html', 'docs/images/native-filter.png', 'docs/images/monitor-light.png', 'docs/images/monitor-dark.png', 'docs/images/monitor-settings.png', 'docs/images/history.png']) {
   if (!files.includes(required)) issues.push(required + ': not staged/tracked');
 }
 if (issues.length) { console.error(issues.join('\n')); process.exitCode = 1; }
