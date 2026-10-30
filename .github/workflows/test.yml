@@ -13,5 +13,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: node --test test/*.test.mjs web-search.test.mjs
+      - run: node --test test/*.test.mjs web-search.test.mjs group-routing.test.mjs
       - run: npm pack --ignore-scripts --dry-run
